@@ -38,5 +38,7 @@
           ov-cli
           ;
       };
+
+      formatter.${system} = pkgs.nixfmt-rfc-style;
     };
 }
