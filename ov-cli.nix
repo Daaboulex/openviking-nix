@@ -12,8 +12,7 @@ rustPlatform.buildRustPackage {
   pname = "ov-cli";
   inherit version src;
 
-  # TODO: replace with real hash after first build attempt
-  cargoHash = lib.fakeHash;
+  cargoHash = "sha256-4rl0nL+4+LFOQDMdk67wW6pcJ+68/OpxCIqFuoIqhbI=";
 
   # Build only the ov_cli crate from the Cargo workspace
   cargoBuildFlags = [ "-p" "ov_cli" ];

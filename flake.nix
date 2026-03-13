@@ -8,6 +8,7 @@
   outputs =
     { self, nixpkgs }:
     let
+      lib = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       version = "0.2.7";
@@ -16,12 +17,8 @@
         owner = "volcengine";
         repo = "OpenViking";
         rev = "v${version}";
-        # TODO: replace with real hash after first build attempt
-        hash = lib.fakeHash;
-        fetchSubmodules = true;
+        hash = "sha256-8VWDJ+hp5p3cWODJdcPvT1PNriZr73pFTiDjY81yT8Q=";
       };
-
-      lib = nixpkgs.lib;
     in
     {
       packages.${system} = rec {

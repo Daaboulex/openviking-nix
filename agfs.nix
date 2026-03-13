@@ -15,24 +15,20 @@ buildGoModule {
 
   # Go module root within the monorepo source tree
   # The go.mod here has: replace github.com/c4pt0r/agfs/agfs-sdk/go => ../agfs-sdk/go
-  # This works because fetchSubmodules=true includes the full third_party/agfs/ tree
+  # This works because third_party/agfs/ is vendored directly in the repo (not a submodule)
   modRoot = "third_party/agfs/agfs-server";
 
-  # TODO: replace with real hash after first build attempt
-  vendorHash = lib.fakeHash;
-
-  # CGO needed for the binding shared library
-  CGO_ENABLED = "1";
+  vendorHash = "sha256-K2pHE1UtvHeSRpC92zaNidurZyb61WMW1Uh/+KxK33A=";
 
   # Custom build: produce both server binary and shared library
   buildPhase = ''
     runHook preBuild
 
     # Server binary (standard Go binary)
-    go build -v -trimpath -o agfs-server ./cmd/server
+    CGO_ENABLED=0 go build -v -trimpath -o agfs-server ./cmd/server
 
     # Python binding shared library (CGO, c-shared build mode)
-    go build -buildmode=c-shared -v -trimpath -o libagfsbinding.so ./cmd/pybinding
+    CGO_ENABLED=1 go build -buildmode=c-shared -v -trimpath -o libagfsbinding.so ./cmd/pybinding
 
     runHook postBuild
   '';
