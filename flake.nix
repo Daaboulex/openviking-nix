@@ -26,7 +26,14 @@
 
         agfs = pkgs.callPackage ./agfs.nix { inherit src version; };
         ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version; };
-        openviking = pkgs.callPackage ./package.nix { inherit src version agfs ov-cli; };
+        openviking = pkgs.callPackage ./package.nix {
+          inherit
+            src
+            version
+            agfs
+            ov-cli
+            ;
+        };
       };
 
       nixosModules.default = import ./module.nix self;
@@ -39,6 +46,6 @@
           ;
       };
 
-      formatter.${system} = pkgs.nixfmt-rfc-style;
+      formatter.${system} = pkgs.nixfmt;
     };
 }

@@ -15,7 +15,10 @@ rustPlatform.buildRustPackage {
   cargoHash = "sha256-4rl0nL+4+LFOQDMdk67wW6pcJ+68/OpxCIqFuoIqhbI=";
 
   # Build only the ov_cli crate from the Cargo workspace
-  cargoBuildFlags = [ "-p" "ov_cli" ];
+  cargoBuildFlags = [
+    "-p"
+    "ov_cli"
+  ];
 
   nativeBuildInputs = [ pkg-config ];
 
