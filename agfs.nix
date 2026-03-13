@@ -48,6 +48,7 @@ buildGoModule {
 
   meta = {
     description = "AGFS — Agent File System server and Python binding library";
+    homepage = "https://github.com/volcengine/OpenViking";
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
   };

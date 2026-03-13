@@ -11,6 +11,7 @@ let
   cfg = config.services.openviking;
 in
 {
+  _class = "nixos";
   options.services.openviking = {
     enable = lib.mkEnableOption "OpenViking context database server";
 

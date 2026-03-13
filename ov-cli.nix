@@ -26,7 +26,8 @@ rustPlatform.buildRustPackage {
 
   meta = {
     description = "OpenViking CLI client";
-    license = lib.licenses.mit;
+    homepage = "https://github.com/volcengine/OpenViking";
+    license = lib.licenses.asl20;
     mainProgram = "ov";
     platforms = lib.platforms.linux;
   };
