@@ -185,6 +185,9 @@ nix build .#ov-cli                # Rust CLI only
 CI runs the same chain daily; manual updates rarely needed.
 
 <!-- BEGIN generated:options -->
+## Options
+
+This module declares options under `services.openviking`. See [`module.nix`](module.nix) for all available options.
 <!-- END generated:options -->
 
 ## License
