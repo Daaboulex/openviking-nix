@@ -1,11 +1,9 @@
 # openviking-nix
 
-[![CI](https://github.com/Daaboulex/openviking-nix/actions/workflows/ci.yml/badge.svg)](https://github.com/Daaboulex/openviking-nix/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/Daaboulex/openviking-nix)](./LICENSE)
-[![NixOS](https://img.shields.io/badge/NixOS-unstable-78C0E8?logo=nixos&logoColor=white)](https://nixos.org)
-[![Last commit](https://img.shields.io/github/last-commit/Daaboulex/openviking-nix)](https://github.com/Daaboulex/openviking-nix/commits)
-[![Stars](https://img.shields.io/github/stars/Daaboulex/openviking-nix?style=flat)](https://github.com/Daaboulex/openviking-nix/stargazers)
-[![Issues](https://img.shields.io/github/issues/Daaboulex/openviking-nix)](https://github.com/Daaboulex/openviking-nix/issues)
+<!-- BEGIN generated:badges -->
+[![NixOS unstable](https://img.shields.io/badge/NixOS-unstable-78C0E8?logo=nixos&logoColor=white)](https://nixos.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+<!-- END generated:badges -->
 
 NixOS package for [OpenViking](https://github.com/volcengine/OpenViking) — an agent-native context database for AI agents by ByteDance/Volcengine.
 
@@ -34,6 +32,43 @@ This repo packages the entire OpenViking stack for NixOS from a 4-language monor
 | `ov-cli` | OpenViking Rust CLI client |
 
 The main `openviking` package provides 4 binaries: `openviking-server`, `openviking`, `ov`, `vikingbot`.
+
+<!-- BEGIN generated:upstream -->
+## Upstream
+
+| | |
+|---|---|
+| **Project** | [Viking-Engineering/openviking](https://github.com/Viking-Engineering/openviking) |
+| **License** | Apache-2.0 |
+| **Tracked** | GitHub releases |
+<!-- END generated:upstream -->
+
+<!-- BEGIN generated:installation -->
+## Installation
+
+Add as a flake input:
+
+```nix
+{
+  inputs.openviking = {
+    url = "github:Daaboulex/openviking-nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+```
+
+Then add the overlay:
+
+```nix
+nixpkgs.overlays = [ inputs.openviking.overlays.default ];
+```
+
+Import the NixOS module:
+
+```nix
+imports = [ inputs.openviking.nixosModules.default ];
+```
+<!-- END generated:installation -->
 
 ## Usage
 
@@ -149,6 +184,15 @@ nix build .#ov-cli                # Rust CLI only
 
 CI runs the same chain daily; manual updates rarely needed.
 
+<!-- BEGIN generated:options -->
+<!-- END generated:options -->
+
 ## License
 
 This packaging flake is [Apache-2.0](./LICENSE) licensed (matches upstream). Upstream OpenViking is [Apache-2.0](https://github.com/volcengine/OpenViking/blob/main/LICENSE).
+
+<!-- BEGIN generated:footer -->
+---
+
+*Maintained as part of the [Daaboulex](https://github.com/Daaboulex) NixOS ecosystem.*
+<!-- END generated:footer -->
