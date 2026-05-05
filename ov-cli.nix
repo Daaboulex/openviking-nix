@@ -1,0 +1,37 @@
+# ov — Rust CLI client for OpenViking
+# Built from the workspace at crates/ov_cli/ using the root Cargo.lock
+{
+  lib,
+  rustPlatform,
+  src,
+  version,
+  pkg-config,
+}:
+
+rustPlatform.buildRustPackage {
+  pname = "ov-cli";
+  inherit version src;
+
+  cargoHash = "sha256-xrPNtckQjUOE5DY84QKAvoc0JVQ/OT3q+GlHr1oIlo8=";
+
+  # Build only the ov_cli crate from the Cargo workspace
+  cargoBuildFlags = [
+    "-p"
+    "ov_cli"
+  ];
+
+  nativeBuildInputs = [ pkg-config ];
+
+  # reqwest uses rustls-tls (not openssl), so no system TLS deps needed
+
+  # Tests require a running OpenViking server
+  doCheck = false;
+
+  meta = {
+    description = "OpenViking CLI client";
+    homepage = "https://github.com/volcengine/OpenViking";
+    license = lib.licenses.asl20;
+    mainProgram = "ov";
+    platforms = lib.platforms.linux;
+  };
+}
