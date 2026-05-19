@@ -5,12 +5,17 @@
     "owner": "volcengine",
     "repo": "OpenViking"
   },
-  "packageFile": "flake.nix",
+  "packageFile": "package.nix",
+  "versionFile": "flake.nix",
+  "versionAttr": "version",
   "hashes": [
-    "hash"
+    { "field": "hash", "file": "flake.nix" },
+    { "field": "vendorHash", "file": "agfs.nix" },
+    { "field": "cargoHash", "file": "ov-cli.nix" }
   ],
   "verify": {
-    "binary": "openviking",
-    "args": "--version"
+    "binary": null,
+    "args": null,
+    "check": "wrapper"
   }
 }
