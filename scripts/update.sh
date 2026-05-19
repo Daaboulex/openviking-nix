@@ -229,47 +229,98 @@ fi
 
 # --- Extract hashes (iterative build-fail-parse) ------------------------
 # update.json `hashes` entries are either a bare field name (auto-located in
-# the first *.nix file that declares it) or {"field","file"} when the same
-# field name (e.g. `hash`) appears in several files and must be disambiguated.
-# List them in evaluation-dependency order: source hash first, then vendor
-# hashes (cargoHash / npmDepsHash / vendorHash).
+# the first *.nix file declaring it) or {"field","file"} to disambiguate when
+# a name like `hash` appears in several files.
+#
+# A version bump invalidates EVERY fixed-output hash at once, so a field
+# cannot be isolated by dummying it alone (the others are stale too, and the
+# build fails unpredictably). Instead: dummy all declared hashes, then build
+# repeatedly — each failed build names one FOD and its correct hash; the drv
+# name maps to a declared field. Repeat until the build stops complaining.
 DUMMY_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
+declare -a HF_FIELD=() HF_FILE=()
 mapfile -t HASH_ENTRIES < <(echo "$CONFIG" | jq -c '.hashes // [] | .[]')
 for entry in "${HASH_ENTRIES[@]}"; do
-  # `[?=]` matches both `field = "sha256-..."` and parameterized default
-  # args `field ? "sha256-..."`. The sed capture group preserves whichever
-  # operator was there (turning `?` into `=` would break the function arg).
   if [ "$(echo "$entry" | jq -r 'type')" = "string" ]; then
-    FIELD=$(echo "$entry" | jq -r '.')
-    HASH_FILE=$(grep -rlP "${FIELD}\s*[?=]\s*\"sha256-" --include='*.nix' . 2>/dev/null | head -1 || true)
+    f=$(echo "$entry" | jq -r '.')
+    file=$(grep -rlP "${f}\s*[?=]\s*\"sha256-" --include='*.nix' . 2>/dev/null | head -1 || true)
   else
-    FIELD=$(echo "$entry" | jq -r '.field')
-    HASH_FILE=$(echo "$entry" | jq -r '.file')
+    f=$(echo "$entry" | jq -r '.field')
+    file=$(echo "$entry" | jq -r '.file')
   fi
-  if [ -z "$HASH_FILE" ] || [ ! -f "$HASH_FILE" ]; then
-    err "Hash field '$FIELD': could not resolve a .nix file ('$HASH_FILE')"
+  if [ -z "$file" ] || [ ! -f "$file" ]; then
+    err "Hash field '$f': could not resolve a .nix file ('$file')"
     output "error_type" "hash-extraction"
     exit 1
   fi
-  CURRENT_HASH=$(grep -oP "${FIELD}\s*[?=]\s*\"sha256-\K[^\"]*" "$HASH_FILE" | head -1 || true)
-  if [ -z "$CURRENT_HASH" ]; then
-    err "Hash field '$FIELD' not found in $HASH_FILE"
-    output "error_type" "hash-extraction"
-    exit 1
-  fi
-  log "Extracting hash '$FIELD' (in $HASH_FILE)..."
-  sed -i "s|\(${FIELD}[[:space:]]*[?=][[:space:]]*\)\"sha256-${CURRENT_HASH}\"|\1\"${DUMMY_HASH}\"|" "$HASH_FILE"
-  BUILD_OUTPUT=$(nix build .#default 2>&1 || true)
-  NEW_HASH=$(echo "$BUILD_OUTPUT" | grep -oP 'got:\s+sha256-\K\S+' | head -1 || true)
-  if [ -z "$NEW_HASH" ]; then
-    err "Failed to extract hash '$FIELD'"
-    output "error_type" "hash-extraction"
-    exit 1
-  fi
-  sed -i "s|\(${FIELD}[[:space:]]*[?=][[:space:]]*\)\"${DUMMY_HASH}\"|\1\"sha256-${NEW_HASH}\"|" "$HASH_FILE"
-  log "Extracted '$FIELD': sha256-$NEW_HASH"
+  HF_FIELD+=("$f")
+  HF_FILE+=("$file")
 done
+
+# set_hash <field> <file> <value> — replaces the field's sha256 value,
+# preserving whichever operator (`=` or `?`) was used.
+set_hash() {
+  sed -i "s|\(${1}[[:space:]]*[?=][[:space:]]*\)\"sha256-[^\"]*\"|\1\"${3}\"|" "$2"
+}
+
+if [ "${#HF_FIELD[@]}" -gt 0 ]; then
+  for i in "${!HF_FIELD[@]}"; do
+    set_hash "${HF_FIELD[$i]}" "${HF_FILE[$i]}" "$DUMMY_HASH"
+  done
+  HASH_MAX=$((${#HF_FIELD[@]} + 2))
+  BUILD_OUTPUT=""
+  for ((iter = 1; iter <= HASH_MAX; iter++)); do
+    BUILD_OUTPUT=$(nix build .#default --no-link 2>&1 || true)
+    echo "$BUILD_OUTPUT" | grep -q 'hash mismatch in fixed-output' || break
+    BLOCK=$(echo "$BUILD_OUTPUT" | grep -A3 'hash mismatch in fixed-output derivation' | head -4)
+    DRV=$(echo "$BLOCK" | grep -oP "derivation '\K[^']+" | head -1)
+    GOT=$(echo "$BLOCK" | grep -oP 'got:\s+sha256-\K\S+' | head -1 || true)
+    [ -z "$GOT" ] && GOT=$(echo "$BLOCK" | grep -oP 'use\s+"sha256-\K[^"]+' | head -1 || true)
+    if [ -z "$GOT" ]; then
+      err "hash mismatch reported but no replacement hash could be parsed"
+      output "error_type" "hash-extraction"
+      exit 1
+    fi
+    case "$DRV" in
+    *go-modules*) WANT="vendorHash" ;;
+    *npm-deps* | *-npm-*) WANT="npmDepsHash" ;;
+    *cargo* | *vendor.tar*) WANT="cargoHash" ;;
+    *) WANT="" ;;
+    esac
+    IDX=-1
+    for i in "${!HF_FIELD[@]}"; do
+      if [ -n "$WANT" ] && [ "${HF_FIELD[$i]}" = "$WANT" ]; then
+        IDX=$i
+        break
+      fi
+    done
+    if [ "$IDX" -lt 0 ]; then
+      # source hash: the declared field that is not a known vendor field
+      for i in "${!HF_FIELD[@]}"; do
+        case "${HF_FIELD[$i]}" in
+        vendorHash | npmDepsHash | cargoHash) ;;
+        *)
+          IDX=$i
+          break
+          ;;
+        esac
+      done
+    fi
+    if [ "$IDX" -lt 0 ]; then
+      err "Could not map FOD '$DRV' to a declared hash field"
+      output "error_type" "hash-extraction"
+      exit 1
+    fi
+    log "Hash '${HF_FIELD[$IDX]}' (FOD ${DRV##*/}): sha256-$GOT"
+    set_hash "${HF_FIELD[$IDX]}" "${HF_FILE[$IDX]}" "sha256-$GOT"
+  done
+  if echo "$BUILD_OUTPUT" | grep -q 'hash mismatch in fixed-output'; then
+    err "Hash extraction did not converge after $HASH_MAX iterations"
+    output "error_type" "hash-extraction"
+    exit 1
+  fi
+fi
 
 # --- Verification chain --------------------------------------------------
 log "Step 1/3: nix flake check --no-build"
