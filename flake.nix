@@ -27,7 +27,7 @@
           }
         );
 
-      version = "0.2.10";
+      version = "0.3.17";
 
       mkSrc =
         pkgs:
@@ -35,26 +35,35 @@
           owner = "volcengine";
           repo = "OpenViking";
           rev = "v${version}";
-          hash = "sha256-BDe48CvXGRvBGTx3PLYZi6ugVhgGa/vdZZoErnQtUb8=";
+          hash = "sha256-wJuC5pN3+pMiq4rCNoUeXjO0lWFn6sejMJ6ml0TXf8s=";
         };
+
+      # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
+      # All three crates resolve against the single root Cargo.lock, so one
+      # vendor — and one cargoHash — covers every Rust build in this repo.
+      cargoHash = "sha256-Pv9TeE9c/U46ScI40FHwvXjeYZ7/D3N03pYXEU+uIPQ=";
     in
     {
       packages = forAllSystems (
         { pkgs, ... }:
         let
           src = mkSrc pkgs;
+          cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+            inherit src;
+            hash = cargoHash;
+          };
         in
         rec {
           default = openviking;
 
-          agfs = pkgs.callPackage ./agfs.nix { inherit src version; };
-          ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version; };
+          ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
+          ragfs-python = pkgs.callPackage ./ragfs-python.nix { inherit src version cargoDeps; };
           openviking = pkgs.callPackage ./package.nix {
             inherit
               src
               version
-              agfs
               ov-cli
+              ragfs-python
               ;
           };
         }
@@ -65,7 +74,6 @@
       overlays.default = final: prev: {
         inherit (self.packages.${final.stdenv.hostPlatform.system})
           openviking
-          agfs
           ov-cli
           ;
       };

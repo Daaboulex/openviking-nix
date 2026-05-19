@@ -10,8 +10,7 @@
   "versionAttr": "version",
   "hashes": [
     { "field": "hash", "file": "flake.nix" },
-    { "field": "vendorHash", "file": "agfs.nix" },
-    { "field": "cargoHash", "file": "ov-cli.nix" }
+    { "field": "cargoHash", "file": "flake.nix" }
   ],
   "verify": {
     "binary": null,
