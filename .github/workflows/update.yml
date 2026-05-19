@@ -21,7 +21,7 @@ jobs:
         run: |
           set +e
           bash scripts/update.sh 2>&1 | tee /tmp/update.log
-          EXIT_CODE=$?
+          EXIT_CODE=${PIPESTATUS[0]}  # update.sh's exit, not tee's
           {
             echo "exit_code=$EXIT_CODE"
           } >> "$GITHUB_OUTPUT"

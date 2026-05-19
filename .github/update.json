@@ -2,10 +2,10 @@
   "package": "openviking",
   "upstream": {
     "type": "github-release",
-    "owner": "Viking-Engineering",
-    "repo": "openviking"
+    "owner": "volcengine",
+    "repo": "OpenViking"
   },
-  "packageFile": "package.nix",
+  "packageFile": "flake.nix",
   "hashes": [
     "hash"
   ],
