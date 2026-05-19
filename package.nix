@@ -310,8 +310,8 @@ python3Packages.buildPythonApplication {
   # Confirm the native artifacts landed in the package.
   postInstall = ''
     site=$out/lib/python*/site-packages/openviking
-    test -f $site/bin/ov || echo "WARNING: ov binary not found in package"
-    test -f "$(echo $site/lib/ragfs_python*.so)" || echo "WARNING: ragfs_python extension not found in package"
+    test -f $site/bin/ov || { echo "ERROR: ov binary not found in package" >&2; exit 1; }
+    test -f "$(echo $site/lib/ragfs_python*.so)" || { echo "ERROR: ragfs_python extension not found in package" >&2; exit 1; }
   '';
 
   meta = {
