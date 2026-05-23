@@ -27,7 +27,7 @@
           }
         );
 
-      version = "0.3.17";
+      version = "0.3.19";
 
       mkSrc =
         pkgs:
@@ -35,13 +35,13 @@
           owner = "volcengine";
           repo = "OpenViking";
           rev = "v${version}";
-          hash = "sha256-wJuC5pN3+pMiq4rCNoUeXjO0lWFn6sejMJ6ml0TXf8s=";
+          hash = "sha256-hzDNORFmNWfPJ97resh5LWmG+8Qwg5/xiw0gD36ozDw=";
         };
 
       # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
       # All three crates resolve against the single root Cargo.lock, so one
       # vendor — and one cargoHash — covers every Rust build in this repo.
-      cargoHash = "sha256-Pv9TeE9c/U46ScI40FHwvXjeYZ7/D3N03pYXEU+uIPQ=";
+      cargoHash = "sha256-lVVbZPQPq0Hp8QWb6awnTAsa0aiuoBN/culZ3m/jV+4=";
     in
     {
       packages = forAllSystems (
