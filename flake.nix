@@ -27,7 +27,7 @@
           }
         );
 
-      version = "0.3.19";
+      version = "0.3.20";
 
       mkSrc =
         pkgs:
@@ -35,7 +35,7 @@
           owner = "volcengine";
           repo = "OpenViking";
           rev = "v${version}";
-          hash = "sha256-hzDNORFmNWfPJ97resh5LWmG+8Qwg5/xiw0gD36ozDw=";
+          hash = "sha256-BQ+3BZB9TR3fHv8v1P/HUvn+hSHJzbdoEM7rhKgp8hY=";
         };
 
       # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
