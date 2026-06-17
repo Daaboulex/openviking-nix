@@ -35,5 +35,8 @@
     "ai-agents",
     "context-database",
     "volcengine"
-  ]
+  ],
+  "platforms": {
+    "aarch64-linux": "prebuilt x86_64 tree-sitter wheels + AVX2-only SIMD engine"
+  }
 }
