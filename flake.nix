@@ -35,12 +35,17 @@
       perSystem =
         { pkgs, ... }:
         let
-          version = "0.3.24";
+          version = "0.4.2";
+          # Distinct hash names so the updater (update.json hashes [hash, cargoHash])
+          # targets each unambiguously: a bare `hash =` for the source, `cargoHash =`
+          # for the vendor. Two same-named `hash =` literals here previously collided
+          # and the updater clobbered both with the source hash (issue #6).
+          cargoHash = "sha256-JyVD4IQADVdwJ8cA5lTo3qfp2KKkta0XGiOvNZGMcEw=";
           src = pkgs.fetchFromGitHub {
             owner = "volcengine";
             repo = "OpenViking";
             rev = "v${version}";
-            hash = "sha256-8yIaUe2UKe/lek0QmBQNm6fv9UjL97MmQ8OA+/YQEqM=";
+            hash = "sha256-NxDjLTWOV5FqGAzBnz97lz1u1JVJFYtVHwmG5mZAGsA=";
           };
 
           # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
@@ -48,7 +53,7 @@
           # vendor - and one cargoHash - covers every Rust build in this repo.
           cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
             inherit src;
-            hash = "sha256-1fd6wMzmEWi6cfOcrpYVN9MMHHF8Fan8e3Z+ubZV7Lw=";
+            hash = cargoHash;
           };
 
           ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
