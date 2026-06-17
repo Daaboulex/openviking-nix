@@ -9,12 +9,31 @@
   "versionFile": "flake.nix",
   "versionAttr": "version",
   "hashes": [
-    { "field": "hash", "file": "flake.nix" },
-    { "field": "cargoHash", "file": "flake.nix" }
+    {
+      "field": "hash",
+      "file": "flake.nix"
+    },
+    {
+      "field": "cargoHash",
+      "file": "flake.nix"
+    }
   ],
   "verify": {
     "binary": null,
     "args": null,
     "check": "wrapper"
-  }
+  },
+  "description": "OpenViking packaged for NixOS - agent-native context database for AI agents, with server, CLI, and NixOS module",
+  "topics": [
+    "nix",
+    "nixos",
+    "flake",
+    "nixos-module",
+    "openviking",
+    "rag",
+    "vector-database",
+    "ai-agents",
+    "context-database",
+    "volcengine"
+  ]
 }

@@ -191,7 +191,7 @@ This module declares options under `services.openviking`. See [`module.nix`](mod
 
 ## License
 
-This packaging flake is [Apache-2.0](./LICENSE) licensed (matches upstream). Upstream OpenViking is [Apache-2.0](https://github.com/volcengine/OpenViking/blob/main/LICENSE).
+The Nix packaging code in this repo is [MIT](./LICENSE) licensed. Upstream OpenViking is [Apache-2.0](https://github.com/volcengine/OpenViking/blob/main/LICENSE).
 
 <!-- BEGIN generated:footer -->
 ---

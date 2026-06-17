@@ -1,60 +1,55 @@
 {
-  description = "OpenViking — agent-native context database for AI agents";
+  description = "OpenViking - agent-native context database for AI agents";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    std = {
+      url = "github:Daaboulex/nix-packaging-standard?ref=v2.5.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.git-hooks.follows = "git-hooks";
+    };
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      git-hooks,
-    }:
-    let
-      supportedSystems = [ "x86_64-linux" ];
-      forAllSystems =
-        fn:
-        nixpkgs.lib.genAttrs supportedSystems (
-          system:
-          fn {
-            pkgs = import nixpkgs { localSystem.system = system; };
-            inherit system;
-          }
-        );
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+      imports = [ inputs.std.flakeModules.base ];
 
-      version = "0.3.24";
+      flake = {
+        nixosModules.default = import ./module.nix inputs.self;
 
-      mkSrc =
-        pkgs:
-        pkgs.fetchFromGitHub {
-          owner = "volcengine";
-          repo = "OpenViking";
-          rev = "v${version}";
-          hash = "sha256-8yIaUe2UKe/lek0QmBQNm6fv9UjL97MmQ8OA+/YQEqM=";
+        overlays.default = final: prev: {
+          inherit (inputs.self.packages.${final.stdenv.hostPlatform.system})
+            openviking
+            ov-cli
+            ;
         };
+      };
 
-      # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
-      # All three crates resolve against the single root Cargo.lock, so one
-      # vendor — and one cargoHash — covers every Rust build in this repo.
-      cargoHash = "sha256-1fd6wMzmEWi6cfOcrpYVN9MMHHF8Fan8e3Z+ubZV7Lw=";
-    in
-    {
-      packages = forAllSystems (
+      perSystem =
         { pkgs, ... }:
         let
-          src = mkSrc pkgs;
+          version = "0.3.24";
+          src = pkgs.fetchFromGitHub {
+            owner = "volcengine";
+            repo = "OpenViking";
+            rev = "v${version}";
+            hash = "sha256-8yIaUe2UKe/lek0QmBQNm6fv9UjL97MmQ8OA+/YQEqM=";
+          };
+
+          # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
+          # All three crates resolve against the single root Cargo.lock, so one
+          # vendor - and one cargoHash - covers every Rust build in this repo.
           cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
             inherit src;
-            hash = cargoHash;
+            hash = "sha256-1fd6wMzmEWi6cfOcrpYVN9MMHHF8Fan8e3Z+ubZV7Lw=";
           };
-        in
-        rec {
-          default = openviking;
 
           ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
           ragfs-python = pkgs.callPackage ./ragfs-python.nix { inherit src version cargoDeps; };
@@ -66,48 +61,12 @@
               ragfs-python
               ;
           };
-        }
-      );
-
-      nixosModules.default = import ./module.nix self;
-
-      overlays.default = final: prev: {
-        inherit (self.packages.${final.stdenv.hostPlatform.system})
-          openviking
-          ov-cli
-          ;
-      };
-
-      formatter = forAllSystems ({ pkgs, ... }: pkgs.nixfmt);
-
-      checks = forAllSystems (
-        { system, ... }:
+        in
         {
-          pre-commit-check = git-hooks.lib.${system}.run {
-            src = self;
-            hooks.nixfmt-rfc-style.enable = true;
-            hooks.typos.enable = true;
-            hooks.rumdl.enable = true;
-            hooks.check-readme-sections = {
-              enable = true;
-              name = "check-readme-sections";
-              entry = "bash scripts/check-readme-sections.sh";
-              files = "README\.md$";
-              language = "system";
-            };
+          packages = {
+            default = openviking;
+            inherit openviking ov-cli ragfs-python;
           };
-        }
-      );
-
-      devShells = forAllSystems (
-        { pkgs, system }:
-        {
-          default = pkgs.mkShell {
-            inherit (self.checks.${system}.pre-commit-check) shellHook;
-            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-            packages = with pkgs; [ nil ];
-          };
-        }
-      );
+        };
     };
 }

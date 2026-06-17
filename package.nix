@@ -317,7 +317,7 @@ python3Packages.buildPythonApplication {
   meta = {
     description = "OpenViking — agent-native context database for AI agents";
     homepage = "https://github.com/volcengine/OpenViking";
-    license = lib.licenses.agpl3Only;
+    license = lib.licenses.asl20;
     mainProgram = "openviking-server";
     platforms = lib.platforms.linux;
   };
