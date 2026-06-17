@@ -319,6 +319,6 @@ python3Packages.buildPythonApplication {
     homepage = "https://github.com/volcengine/OpenViking";
     license = lib.licenses.asl20;
     mainProgram = "openviking-server";
-    platforms = lib.platforms.linux;
+    platforms = [ "x86_64-linux" ];
   };
 }

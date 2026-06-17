@@ -32,6 +32,6 @@ rustPlatform.buildRustPackage {
     homepage = "https://github.com/volcengine/OpenViking";
     license = lib.licenses.asl20;
     mainProgram = "ov";
-    platforms = lib.platforms.linux;
+    platforms = [ "x86_64-linux" ];
   };
 }
