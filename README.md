@@ -40,6 +40,7 @@ The main `openviking` package provides 4 binaries: `openviking-server`, `openvik
 | **Project** | [Viking-Engineering/openviking](https://github.com/Viking-Engineering/openviking) |
 | **License** | Apache-2.0 |
 | **Tracked** | GitHub releases |
+
 <!-- END generated:upstream -->
 
 <!-- BEGIN generated:installation -->
@@ -67,6 +68,7 @@ Import the NixOS module:
 ```nix
 imports = [ inputs.openviking.nixosModules.default ];
 ```
+
 <!-- END generated:installation -->
 
 ## Usage
@@ -103,6 +105,7 @@ services.openviking = {
 ```
 
 The service runs with `DynamicUser`, `ProtectSystem=strict`, `NoNewPrivileges`, and other systemd hardening options.
+
 ### NixOS module options
 
 | Option | Type | Default | Description |
@@ -153,8 +156,8 @@ services.openviking = {
 
 OpenViking runs as a system user with `ProtectHome=true` by default. To index local directories in `/home`:
 
-1.  **Run as your user**: Set `services.openviking.user = "youruser";` (Easiest and recommended for personal workstations).
-2.  **Alternatively**: Keep `openviking` user, set `services.openviking.readOnlyPaths = [ "/path" ];`, and ensure permissions are correct on your home directory.
+1. **Run as your user**: Set `services.openviking.user = "youruser";` (Easiest and recommended for personal workstations).
+2. **Alternatively**: Keep `openviking` user, set `services.openviking.readOnlyPaths = [ "/path" ];`, and ensure permissions are correct on your home directory.
 
 Supports OpenAI, Volcengine, Jina, and LiteLLM (for Claude, Gemini, etc.) providers. See [OpenViking docs](https://github.com/volcengine/OpenViking) for the full config reference.
 
