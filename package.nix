@@ -162,6 +162,21 @@ let
     doCheck = false;
     meta.license = lib.licenses.asl20;
   };
+
+  # openviking-sdk: standalone Python HTTP client split out upstream in 0.4.5,
+  # now a runtime dependency of the main package (PyPI pure-python wheel).
+  openviking-sdk = python3Packages.buildPythonPackage {
+    pname = "openviking-sdk";
+    version = "0.1.2";
+    format = "wheel";
+    src = fetchurl {
+      url = "https://files.pythonhosted.org/packages/2d/c7/f21f7899a8902bbc9b2f8bfc6f60eb0b64addf44fc71b76f0c72241183f6/openviking_sdk-0.1.2-py3-none-any.whl";
+      hash = "sha256-nkxxnQ8/hN1ob/zkW4DocwyBXObk2pS5RBYwfGecql8=";
+    };
+    dependencies = [ python3Packages.httpx ];
+    doCheck = false;
+    meta.license = lib.licenses.asl20;
+  };
 in
 
 python3Packages.buildPythonApplication {
@@ -261,6 +276,10 @@ python3Packages.buildPythonApplication {
       readabilipy
       markdownify
 
+      # Feeds / XML (vikingbot hooks, added upstream in 0.4.6)
+      feedparser
+      defusedxml
+
       # Code parsing (tree-sitter)
       tree-sitter
       tree-sitter-python
@@ -299,6 +318,9 @@ python3Packages.buildPythonApplication {
       # Volcengine SDKs (packaged from PyPI wheels).
       volcengine
       volcengine-python-sdk
+
+      # OpenViking's own standalone HTTP SDK (split out upstream in 0.4.5).
+      openviking-sdk
 
       # The Rust RAGFS PyO3 binding (also injected into openviking/lib/).
       ragfs-python
