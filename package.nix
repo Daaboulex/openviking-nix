@@ -280,6 +280,10 @@ python3Packages.buildPythonApplication {
       feedparser
       defusedxml
 
+      # Web crawling (added upstream in 0.4.9)
+      scrapy
+      trafilatura
+
       # Code parsing (tree-sitter)
       tree-sitter
       tree-sitter-python
