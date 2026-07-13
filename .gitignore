@@ -6,7 +6,6 @@ AI-progress.json
 AI-tasks.json
 result-*
 .direnv
-.envrc
 
 # AI context (local-only, never track)
 CLAUDE.md
@@ -32,3 +31,17 @@ self-improvements-pending-*.jsonl
 handoffs/
 deferred-work.jsonl
 fmt_check
+.devshell/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+build/
+dist/
+target/
+*.egg-info/
+.eggs/
+node_modules/
+.venv/
+venv/

@@ -95,16 +95,16 @@ let
   };
 
   # opentelemetry-instrumentation-asyncio — not packaged individually in
-  # nixpkgs. Pinned to 0.55b0 to match nixpkgs' opentelemetry-* stack (the
-  # wheel pins its siblings with ==; openviking's pythonRelaxDeps covers the
-  # resulting "<0.61b0" gap against pyproject).
+  # nixpkgs. Pinned to 0.64b0 to match nixpkgs' opentelemetry-* stack (the
+  # wheel pins its siblings with ==, so this version must track the stack
+  # nixpkgs ships; the runtime-deps check fails loudly when they diverge).
   opentelemetry-instrumentation-asyncio = python3Packages.buildPythonPackage {
     pname = "opentelemetry-instrumentation-asyncio";
-    version = "0.55b0";
+    version = "0.64b0";
     format = "wheel";
     src = fetchurl {
-      url = "https://files.pythonhosted.org/packages/82/71/64ed9dc18c278fd153a09af240c46dbbcf13244b76c256c9c6798c2faf1d/opentelemetry_instrumentation_asyncio-0.55b0-py3-none-any.whl";
-      hash = "sha256-Mnj/iWSHfOFjiLuvZGV6pt+j5ewHF1WD7XINN89KVpE=";
+      url = "https://files.pythonhosted.org/packages/48/91/d35ff82558e7de1fc53b9ed4465d672f2f872ec1225402bdfc0e95f24cc3/opentelemetry_instrumentation_asyncio-0.64b0-py3-none-any.whl";
+      hash = "sha256-g36FOK7g9N7xtLCFQI8Yfa/4R/onkDBJptPTw0xN2iU=";
     };
     dependencies = with python3Packages; [
       opentelemetry-api
