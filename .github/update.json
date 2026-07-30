@@ -3,7 +3,8 @@
   "upstream": {
     "type": "github-release",
     "owner": "volcengine",
-    "repo": "OpenViking"
+    "repo": "OpenViking",
+    "tagFilter": "^v[0-9]"
   },
   "packageFile": "package.nix",
   "versionFile": "flake.nix",
