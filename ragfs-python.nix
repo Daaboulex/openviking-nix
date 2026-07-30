@@ -10,13 +10,16 @@
   cargo,
   pkg-config,
   src,
-  version,
   cargoDeps,
 }:
 
 python3Packages.buildPythonPackage {
   pname = "ragfs-python";
-  inherit version src cargoDeps;
+  # The crate versions itself independently of the OpenViking release; nixpkgs'
+  # pythonMetadataCheckPhase compares this against the built wheel's METADATA,
+  # so an upstream crate bump fails loudly here instead of shipping a lie.
+  version = "0.1.0";
+  inherit src cargoDeps;
   pyproject = true;
 
   # The maturin project lives in the workspace subdirectory.

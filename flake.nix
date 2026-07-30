@@ -9,7 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     std = {
-      url = "github:Daaboulex/nix-packaging-standard?ref=v2.11.0";
+      url = "github:Daaboulex/nix-packaging-standard?ref=v2.17.0";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.git-hooks.follows = "git-hooks";
     };
@@ -77,7 +77,7 @@
             };
 
             ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
-            ragfs-python = pkgs.callPackage ./ragfs-python.nix { inherit src version cargoDeps; };
+            ragfs-python = pkgs.callPackage ./ragfs-python.nix { inherit src cargoDeps; };
             openviking = pkgs.callPackage ./package.nix {
               inherit
                 src
