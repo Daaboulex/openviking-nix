@@ -39,7 +39,10 @@ python3Packages.buildPythonPackage {
   # Tests need a running filesystem backend.
   doCheck = false;
 
-  pythonImportsCheck = [ "ragfs_python" ];
+  # No import check here: the crate's #[pymodule] init hard-imports
+  # openviking.storage.errors, and openviking depends on this package, so the
+  # extension is only importable from openviking's environment. The check lives
+  # there (package.nix pythonImportsCheck).
 
   meta = {
     description = "PyO3 Python bindings for RAGFS — the Rust AGFS filesystem";

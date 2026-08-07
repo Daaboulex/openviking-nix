@@ -333,6 +333,13 @@ python3Packages.buildPythonApplication {
   # Tests require a running server + network + API keys.
   doCheck = false;
 
+  # ragfs_python's module init imports openviking.storage.errors, so this is the
+  # only environment where the extension can be loaded at all.
+  pythonImportsCheck = [
+    "openviking"
+    "ragfs_python"
+  ];
+
   # Confirm the native artifacts landed in the package.
   postInstall = ''
     site=$out/lib/python*/site-packages/openviking
