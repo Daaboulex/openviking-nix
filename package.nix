@@ -290,6 +290,8 @@ python3Packages.buildPythonApplication {
       tree-sitter-javascript
       tree-sitter-rust
       tree-sitter-c-sharp
+      tree-sitter-language-pack
+      grep-ast
 
       # Observability
       opentelemetry-api
