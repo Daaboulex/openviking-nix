@@ -12,22 +12,21 @@ NixOS package for [OpenViking](https://github.com/volcengine/OpenViking) — an 
 
 OpenViking organizes agent context (memory, resources, skills) through a virtual filesystem paradigm using `viking://` protocol paths. It features tiered context loading (L0/L1/L2), hierarchical RAG, automatic session management, and a chat bot framework.
 
-This repo packages the entire OpenViking stack for NixOS from a 4-language monorepo build:
+This repo packages the entire OpenViking stack for NixOS from its monorepo:
 
 | Component | Language | Output |
 |---|---|---|
-| AGFS server | Go | `agfs-server` binary |
-| AGFS binding | Go (CGO) | `libagfsbinding.so` |
 | ov CLI | Rust | `ov` binary |
-| Vector engine | C++17 / pybind11 | `engine.cpython-*.so` |
-| OpenViking | Python (FastAPI) | Server + client library |
+| RAGFS binding | Rust (PyO3) | `ragfs_python` extension module |
+| Vector engine | C++17 / pybind11 | embedded in the Python package |
+| OpenViking | Python (FastAPI) | server + client library |
 
 ## Packages
 
 | Package | Description |
 |---|---|
 | `openviking` (default) | Full package with server, CLI, vector engine, and all native components |
-| `agfs` | AGFS server binary + Python binding shared library |
+| `ragfs-python` | Rust RAGFS PyO3 binding (`ragfs_python` extension) |
 | `ov-cli` | OpenViking Rust CLI client |
 
 The main `openviking` package provides 4 binaries: `openviking-server`, `openviking`, `ov`, `vikingbot`.
@@ -37,7 +36,7 @@ The main `openviking` package provides 4 binaries: `openviking-server`, `openvik
 
 | | |
 |---|---|
-| **Project** | [Viking-Engineering/openviking](https://github.com/Viking-Engineering/openviking) |
+| **Project** | [volcengine/OpenViking](https://github.com/volcengine/OpenViking) |
 | **License** | Apache-2.0 |
 | **Tracked** | GitHub releases |
 
@@ -86,7 +85,7 @@ inputs.openviking = {
 
 ```nix
 nixpkgs.overlays = [ inputs.openviking.overlays.default ];
-# Provides: pkgs.openviking, pkgs.agfs, pkgs.ov-cli
+# Provides: pkgs.openviking, pkgs.ov-cli, pkgs.ragfs-python
 ```
 
 ### NixOS module (systemd service)
@@ -179,7 +178,7 @@ nix develop                       # enter dev shell, installs pre-commit hooks
 nix fmt                           # format flake
 nix flake check --no-build        # eval check
 nix build                         # builds the full openviking package
-nix build .#agfs                  # AGFS server only
+nix build .#ragfs-python          # Rust RAGFS binding only
 nix build .#ov-cli                # Rust CLI only
 ./result/bin/openviking --version # binary verify
 ```
@@ -197,7 +196,4 @@ This module declares options under `services.openviking`. See [`module.nix`](mod
 The Nix packaging code in this repo is [MIT](./LICENSE) licensed. Upstream OpenViking is [Apache-2.0](https://github.com/volcengine/OpenViking/blob/main/LICENSE).
 
 <!-- BEGIN generated:footer -->
----
-
-*Maintained as part of the [Daaboulex](https://github.com/Daaboulex) NixOS ecosystem.*
 <!-- END generated:footer -->
