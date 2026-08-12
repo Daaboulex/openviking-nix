@@ -1,3 +1,0 @@
-# certifi is the Python CA-bundle package, not a typo of "certify".
-[default.extend-words]
-certifi = "certifi"
