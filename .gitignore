@@ -45,3 +45,9 @@ target/
 node_modules/
 .venv/
 venv/
+.session-handoff*.md
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.rumdl_cache/
+.mypy_cache/
