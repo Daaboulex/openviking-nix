@@ -71,6 +71,19 @@ let
     hash = "sha256-XsRIyFT+oyQUoESRR9ZIvFut33oDVwCMSr4yads1Nwo=";
   };
 
+  firecrawl-anydoc = python3Packages.buildPythonPackage {
+    pname = "firecrawl-anydoc";
+    version = "0.2.4";
+    format = "wheel";
+    src = fetchurl {
+      url = "https://files.pythonhosted.org/packages/fc/16/feeca9705bfdb237f1cb69ede0b373b144c0d51df4297e595a74b815557e/firecrawl_anydoc-0.2.4-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl";
+      hash = "sha256-DlrtAb9tTlxYjTNjiIKT8s7rn+sARJoy4LqZN5fPC9M=";
+    };
+    doCheck = false;
+    pythonImportsCheck = [ "anydoc" ];
+    meta.license = lib.licenses.mit;
+  };
+
   # lark-oapi (Feishu/Lark OpenAPI SDK) — not in nixpkgs.
   lark-oapi = python3Packages.buildPythonPackage {
     pname = "lark-oapi";
@@ -318,6 +331,7 @@ python3Packages.buildPythonApplication {
       tree-sitter-lua
 
       # Other PyPI-wheel deps not in nixpkgs.
+      firecrawl-anydoc
       lark-oapi
       opentelemetry-instrumentation-asyncio
 
