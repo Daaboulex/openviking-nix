@@ -31,6 +31,48 @@
           map (n: (import (dir + "/${n}")).overlay) (
             builtins.filter (n: inputs.nixpkgs.lib.hasSuffix ".nix" n) names
           );
+
+        # The whole build chain as a function of a package set, so perSystem and
+        # the overlay produce the same packages without either restating them,
+        # and an overlay consumer gets them built against their own nixpkgs.
+        mkPackages =
+          p:
+          let
+            version = "0.4.17.1";
+            # Distinct hash names so the updater (update.json hashes [hash, cargoHash])
+            # targets each unambiguously: a bare `hash =` for the source, `cargoHash =`
+            # for the vendor. Two same-named `hash =` literals here previously collided
+            # and the updater clobbered both with the source hash (issue #6).
+            cargoHash = "sha256-/rHFdldLX4eWwTQuaUwKenbmuZNoJ7vMe8banl7UT94=";
+            src = p.fetchFromGitHub {
+              owner = "volcengine";
+              repo = "OpenViking";
+              rev = "v${version}";
+              hash = "sha256-beDr1OxEcoXtQ/FBdJNaMDSpfoaugVhlPB0/+pFYwfU=";
+            };
+
+            # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
+            # All three crates resolve against the single root Cargo.lock, so one
+            # vendor - and one cargoHash - covers every Rust build in this repo.
+            cargoDeps = p.rustPlatform.fetchCargoVendor {
+              inherit src;
+              hash = cargoHash;
+            };
+
+            ov-cli = p.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
+            ragfs-python = p.callPackage ./ragfs-python.nix { inherit src cargoDeps; };
+          in
+          {
+            inherit ov-cli ragfs-python;
+            openviking = p.callPackage ./package.nix {
+              inherit
+                src
+                version
+                ov-cli
+                ragfs-python
+                ;
+            };
+          };
       in
       {
         systems = [ "x86_64-linux" ];
@@ -41,10 +83,7 @@
 
           overlays = {
             default = final: _prev: {
-              inherit (inputs.self.packages.${final.stdenv.hostPlatform.system})
-                openviking
-                ov-cli
-                ;
+              inherit (mkPackages final) openviking ov-cli;
             };
             # No permanent glue overlay here -- fixes apply to this flake's own
             # pkgs below, so the heal probe evaluates plain nixpkgs.
@@ -55,37 +94,7 @@
         perSystem =
           { pkgs, system, ... }:
           let
-            version = "0.4.17.1";
-            # Distinct hash names so the updater (update.json hashes [hash, cargoHash])
-            # targets each unambiguously: a bare `hash =` for the source, `cargoHash =`
-            # for the vendor. Two same-named `hash =` literals here previously collided
-            # and the updater clobbered both with the source hash (issue #6).
-            cargoHash = "sha256-/rHFdldLX4eWwTQuaUwKenbmuZNoJ7vMe8banl7UT94=";
-            src = pkgs.fetchFromGitHub {
-              owner = "volcengine";
-              repo = "OpenViking";
-              rev = "v${version}";
-              hash = "sha256-beDr1OxEcoXtQ/FBdJNaMDSpfoaugVhlPB0/+pFYwfU=";
-            };
-
-            # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
-            # All three crates resolve against the single root Cargo.lock, so one
-            # vendor - and one cargoHash - covers every Rust build in this repo.
-            cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-              inherit src;
-              hash = cargoHash;
-            };
-
-            ov-cli = pkgs.callPackage ./ov-cli.nix { inherit src version cargoDeps; };
-            ragfs-python = pkgs.callPackage ./ragfs-python.nix { inherit src cargoDeps; };
-            openviking = pkgs.callPackage ./package.nix {
-              inherit
-                src
-                version
-                ov-cli
-                ragfs-python
-                ;
-            };
+            ov = mkPackages pkgs;
           in
           {
             # Fixes from overlays/ reach every consumer of this flake's pkgs.
@@ -95,8 +104,8 @@
             };
 
             packages = {
-              default = openviking;
-              inherit openviking ov-cli ragfs-python;
+              default = ov.openviking;
+              inherit (ov) openviking ov-cli ragfs-python;
             };
           };
       }
