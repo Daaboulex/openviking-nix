@@ -180,11 +180,11 @@ let
   # now a runtime dependency of the main package (PyPI pure-python wheel).
   openviking-sdk = python3Packages.buildPythonPackage {
     pname = "openviking-sdk";
-    version = "0.1.2";
+    version = "0.1.12";
     format = "wheel";
     src = fetchurl {
-      url = "https://files.pythonhosted.org/packages/2d/c7/f21f7899a8902bbc9b2f8bfc6f60eb0b64addf44fc71b76f0c72241183f6/openviking_sdk-0.1.2-py3-none-any.whl";
-      hash = "sha256-nkxxnQ8/hN1ob/zkW4DocwyBXObk2pS5RBYwfGecql8=";
+      url = "https://files.pythonhosted.org/packages/37/76/2acad2f8a9d3e9db0d0e970a5082c793bd8efe322c42e64e8d03c79884f5/openviking_sdk-0.1.12-py3-none-any.whl";
+      hash = "sha256-apRlrtT7Q7GNYsX0YXvNCyAJIzVfOaX9qm5SUQ2DPFQ=";
     };
     dependencies = [ python3Packages.httpx ];
     doCheck = false;
@@ -316,6 +316,7 @@ python3Packages.buildPythonApplication {
       json-repair
       apscheduler
       xxhash
+      rapidfuzz
       jinja2
       tabulate
       protobuf
