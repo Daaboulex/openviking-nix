@@ -9,6 +9,7 @@
   rustc,
   cargo,
   pkg-config,
+  openssl,
   src,
   cargoDeps,
 }:
@@ -33,8 +34,9 @@ python3Packages.buildPythonPackage {
     pkg-config
   ];
 
-  # ragfs (a path dependency) bundles SQLite via rusqlite's `bundled`
-  # feature and uses rustls for S3 — no system TLS/sqlite libraries needed.
+  buildInputs = [ openssl ];
+
+  env.OPENSSL_NO_VENDOR = 1;
 
   # Tests need a running filesystem backend.
   doCheck = false;
