@@ -38,7 +38,7 @@
         mkPackages =
           p:
           let
-            version = "0.4.21";
+            version = "0.4.22";
             # Distinct hash names so the updater (update.json hashes [hash, cargoHash])
             # targets each unambiguously: a bare `hash =` for the source, `cargoHash =`
             # for the vendor. Two same-named `hash =` literals here previously collided
@@ -48,7 +48,7 @@
               owner = "volcengine";
               repo = "OpenViking";
               rev = "v${version}";
-              hash = "sha256-7iCHfcQuyRz/bG8zXzmLYZXg/ri6OYy5MdFbydlXUns=";
+              hash = "sha256-KyVg31Mh6XXePOzr03yDggCKv0iNIbJg6TgixcOk2yQ=";
             };
 
             # Shared Cargo vendor for the workspace (crates/{ov_cli,ragfs,ragfs-python}).
